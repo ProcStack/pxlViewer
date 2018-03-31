@@ -1,4 +1,4 @@
-# **pxlViewer**  *v0.0.6*
+# **pxlViewer**  *v1.0*
 -----------------------------------
 ### **A PyQt and WebView based image viewer.**
 
@@ -35,6 +35,8 @@ ______________________________
 Hitting **`Spacebar`**, **`H`**, or **`Return`** will reset the zoom; fitting the image to your window.
 
 **`R`** to refresh the current image
+
+**`H`** to home the image, sets 100% zoom.
 
 **`Escape`** will close pxlViewer
 
