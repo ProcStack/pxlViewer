@@ -62,7 +62,7 @@ sudo apt-get install python-qt4
 ______________________________
 ## Installation for Windows<br/>
 *Following these insructions only got me so far, but you can find documentation on opencv*<br/>
-[readthedocs.io Setup OpenCV in Windows](http://opencv-python-tutroals.readthedocs.io/en/latest/py_tutorials/py_setup/py_setup_in_windows/py_setup_in_windows.html)<br/>
+[readthedocs.io - Setup OpenCV in Windows](http://opencv-python-tutroals.readthedocs.io/en/latest/py_tutorials/py_setup/py_setup_in_windows/py_setup_in_windows.html)<br/>
 <br/>
 
 **What worked for me on Windows 10 -**<br/>
