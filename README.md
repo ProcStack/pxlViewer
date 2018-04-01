@@ -40,7 +40,7 @@ Use the **`-debug`** or **`-d`** flag to enter debug mode.  Allows for inspectin
 
 ______________________________
 ## Installation for Linux
-*Upgrading pip helped the other install correctly*<br/>
+*Upgrading pip helped the others install correctly*<br/>
 ```
 python -m pip install --upgrade pip
 pip install numpy
@@ -99,17 +99,18 @@ https://sourceforge.net/projects/pyqt/files/PyQt4/PyQt-4.11.4/<br/>
 https://riverbankcomputing.com/software/sip/download<br/>
 https://riverbankcomputing.com/software/pyqt/download<br/><br/>
 
-*To test that pxlViewer works, you'll need to navigate to your desired directory by copying the file browser address bar path into `cmd` like-*<br/>
-`cd C:/path/to/image/directory`
+*To test that pxlViewer works, you'll need to navigate to your desired image directory in your Command Prompt by copying the file browser address bar path into `cmd` like-*<br/>
+`cd C:\path\to\image\directory`
 
 *You can view that directory with-*<br/>
-`python  C:/your/path/to/pxlViewer.py`<br/>
+`python  C:\your\path\to\pxlViewer.py`<br/>
 *Or view a specific image with-*<br/>
 `python  C:\your\path\to\pxlViewer.py imageName.ext`<br/>
 
 ______________________________
 ### Build pxlViewer.exe on Windows
 #### *Make sure pxlViewer works with no errors from your Command Prompt first!*
+##### *(Dedicated Windows exe download in repository to come soon, the exe has some needless bloat currently.)*
 ##### *If pxlViewer works, to continue you'll need to have pyinstaller installed*
 *To install pyinstaller, from your python/Scripts folder again-*<br/>
 `cd C:\Python27\Scripts`<br/>
