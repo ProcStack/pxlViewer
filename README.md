@@ -8,8 +8,7 @@ Supporting JPG, JPEG, PNG, BMP, GIF, and any other web browser supported format.
 I was getting a little tired of the default options in linux; so I made this thing.<br/>
 http://metal-asylum.net/github/pxlViewer06Updates.gif
 
-Updates to come to slim down the code base and make it self contained; ease of use on Windows.<br/>
-Should be completed in a few days.<br/>
+Updates to come to slim down the code base when creating executable on Windows.<br/>
 
 ______________________________
 ## How To Use pxlViewer<br/>
@@ -100,10 +99,7 @@ https://sourceforge.net/projects/pyqt/files/PyQt4/PyQt-4.11.4/<br/>
 https://riverbankcomputing.com/software/sip/download<br/>
 https://riverbankcomputing.com/software/pyqt/download<br/><br/>
 
-
-*Currently, pxlViewer can only be used through Command Prompt;*<br/>
-*In the next few days there should be a self contained executable to launch images with*<br/>
-*For now, you'll need to navigate to your desired directory by copying the file browser address bar path into `cmd` like-*<br/>
+*To test that pxlViewer works, you'll need to navigate to your desired directory by copying the file browser address bar path into `cmd` like-*<br/>
 `cd C:/path/to/image/directory`
 
 *You can view that directory with-*<br/>
