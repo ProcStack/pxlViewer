@@ -8,18 +8,7 @@ I was getting a little tired of the default options in linux; so I made this thi
 http://metal-asylum.net/github/pxlViewer06Updates.gif
 
 ______________________________
-
-I've linked it to an alias for ease of use; in my *.bash_aliases* file I added-<br/>
-**`alias v='python /your/path/to/pxlViewer.py '`**
-
-It can be ran locally from any folder--<br/>
-With no specified file to load, the first image found is displayed.<br/>
-**`v`**
-
-Or with a specific file given; currently only relative paths work. Sorry, absolute path support soon to come.<br/>
-**`v imageFile.jpg`**
-______________________________
-
+## How To Use pxlViewer<br/>
 **`Left click drag`** to move image around
 
 **`Wheel up/down`** or **`right click drag`** to zoom
@@ -47,7 +36,6 @@ Use the **`-debug`** or **`-d`** flag to enter debug mode.  Allows for inspectin
 <br/>
 
 ______________________________
-______________________________
 ## Installation for Linux<br/>
 *Upgrading pip helped the other install correctly*<br/>
 ```
@@ -58,7 +46,20 @@ pip install opencv-python
 pip install Pillow
 sudo apt-get install python-qt4
 ```
-<br/>
+
+______________________________
+
+I've linked it to an alias for ease of use; in *.bash_aliases* or *.bashrc* you can add-<br/>
+**`alias v='python /your/path/to/pxlViewer.py '`**
+
+It can be ran locally from any folder--<br/>
+With no specified file to load, the first image found is displayed.<br/>
+**`v`**
+
+Or with a specific file given; currently only relative paths work. Sorry, absolute path support soon to come.<br/>
+**`v imageFile.jpg`**<br/>
+
+###### End of Linux Install<br/>
 
 ______________________________
 ## Installation for Windows<br/>
