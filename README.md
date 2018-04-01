@@ -1,6 +1,6 @@
 # **pxlViewer**  *v1.0*
 -----------------------------------
-### **A PyQt and WebView based image viewer.**<br/>
+### **A PyQt and WebView based image viewer.**
 
 pxlViewer is a slim, in appearance, image viewer.<br/>
 Supporting JPG, JPEG, PNG, BMP, GIF, and any other web browser supported format.<br/>
@@ -40,7 +40,7 @@ Use the **`-debug`** or **`-d`** flag to enter debug mode.  Allows for inspectin
 <br/>
 
 ______________________________
-## Installation for Linux<br/>
+## Installation for Linux
 *Upgrading pip helped the other install correctly*<br/>
 ```
 python -m pip install --upgrade pip
@@ -66,7 +66,7 @@ Or with a specific file given; currently only relative paths work. Sorry, absolu
 ###### End of Linux Install<br/>
 
 ______________________________
-## Installation for Windows<br/>
+## Installation for Windows
 *Following these insructions only got me so far, but you can find documentation on opencv*<br/>
 [readthedocs.io - Setup OpenCV in Windows](http://opencv-python-tutroals.readthedocs.io/en/latest/py_tutorials/py_setup/py_setup_in_windows/py_setup_in_windows.html)<br/>
 <br/>
@@ -109,7 +109,25 @@ https://riverbankcomputing.com/software/pyqt/download<br/><br/>
 *You can view that directory with-*<br/>
 `python  C:/your/path/to/pxlViewer.py`<br/>
 *Or view a specific image with-*<br/>
-`python  C:/your/path/to/pxlViewer.py imageName.ext`<br/>
+`python  C:\your\path\to\pxlViewer.py imageName.ext`<br/>
+
+______________________________
+### Build pxlViewer.exe on Windows
+#### *Make sure pxlViewer works with no errors from your Command Prompt first!*
+##### *If pxlViewer works, to continue you'll need to have pyinstaller installed*
+*To install pyinstaller, from your python/Scripts folder again-*<br/>
+`cd C:\Python27\Scripts`<br/>
+*Run -*<br/>
+`pip install pyinstaller`<br/>
+
+*Then browse to your pxlViewer download/extract folder and double click the `buildExe.bat` file.*<br/>
+*This may take a couple minutes to build.*<br/>
+
+*After this, you can right click an image, go to `Open With...`, and navegate to-*
+C:\path\to\pxlViewer\\**dist\pxlViewer\pxlViewer.exe**<br/>
+<br/>
+If all is well, your image should open with **pxlViewer**!<br/>
+
 ###### End of Windows Install<br/>
 ______________________________
 
