@@ -91,7 +91,6 @@ pip install matplotlib
 pip install opencv-python
 pip install Pillow
 ```
-<br/>
 
 *You'll need to download sip and PyQt4;*<br/>
 *But as of 4/1/2018, there was no exe build for the newest version of PyQt4.12*<br/>
@@ -102,20 +101,10 @@ https://sourceforge.net/projects/pyqt/files/PyQt4/PyQt-4.11.4/<br/>
 https://riverbankcomputing.com/software/sip/download<br/>
 https://riverbankcomputing.com/software/pyqt/download<br/><br/>
 
-*Test your opencv by running-*<br/>
-`python`
 
-*Then in Python-*<br/>
-```
-import cv2
-print cv2.__version__
-exit()
-```
-<br/>
-
-*pxlViewer can only be used through Command Prompt;*<br/>
-*Starting in pxlViewer v1.2, there should be a self contained executable to launch images with*<br/>
-*For now, you can navigate to your desired directory by copying the address bar path into `cmd` like-*<br/>
+*Currently, pxlViewer can only be used through Command Prompt;*<br/>
+*In the next few days there should be a self contained executable to launch images with*<br/>
+*For now, you'll need to navigate to your desired directory by copying the file browser address bar path into `cmd` like-*<br/>
 `cd C:/path/to/image/directory`
 
 *You can view that directory with-*<br/>
