@@ -2,9 +2,8 @@
 -----------------------------------
 ### **A PyQt and WebView based image viewer.**<br/>
 
-*(Currently only intended for linux)*<br/>
-
-pxlViewer is a slim image viewer.  Supporting JPG, JPEG, PNG, BMP, GIF, and any other web browser supported formats.<br/>
+pxlViewer is a slim, in appearance, image viewer.<br/>
+Supporting JPG, JPEG, PNG, BMP, GIF, and any other web browser supported formats.<br/>
 
 I was getting a little tired of the default options in linux; so I made this thing.<br/>
 http://metal-asylum.net/github/pxlViewer06Updates.gif
