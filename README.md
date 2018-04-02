@@ -19,7 +19,7 @@ ______________________________
 
 **`Wheel up/down`** or **`right click drag`** to zoom
 
-Hitting **`Spacebar`**, **`H`**, or **`Return`** will reset the zoom; fitting the image to your window.
+Hitting **`Spacebar`** or **`Return`** will reset the zoom; fitting the image to your window.
 
 **`R`** to refresh the current image
 
@@ -66,8 +66,9 @@ Or with a specific file given; currently only relative paths work. Sorry, absolu
 
 ______________________________
 ## Installation for Windows
-### To use the premade executable; copy `dist/pxlViewer` to a desired location<br/>
-#### If you want to rebuild the executable for windows, follow the directions below-
+### To use the premade executable; copy `dist/pxlViewer` to a desired location
+### Then delete the extract directory and assign file associations / test by '*Open With . . .*'<br/>
+#### **If you want to rebuild the executable for windows,** follow the directions below-
 **What worked for me on Windows 10 -**<br/>
 *Open a Command Prompt, search for `cmd` in your windows menu*<br/>
 *Find the `pip.exe` in your python folder, copy that path, add `cd`, then paste into `cmd`; it should look similar to this-*<br/>

@@ -19,7 +19,7 @@ ______________________________
 
  `Wheel up/down ` or  `right click drag ` to zoom
 
-Hitting  `Spacebar `,  `H `, or  `Return ` will reset the zoom; fitting the image to your window.
+Hitting  `Spacebar ` or `Return ` will reset the zoom; fitting the image to your window.
 
  `R ` to refresh the current image
 
@@ -67,6 +67,7 @@ Or with a specific file given; currently only relative paths work. Sorry, absolu
 ______________________________
  Installation for Windows
 To use the premade executable; copy `dist/pxlViewer` to a desired location
+Then delete the extract directory and assign file associations / test by 'Open With . . .'
 
 If you want to rebuild the executable for windows, follow the directions below-
 
