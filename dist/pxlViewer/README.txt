@@ -8,10 +8,10 @@ Supporting JPG, JPEG, PNG, BMP, GIF, and any other web browser supported format.
 I was getting a little tired of the default options in linux; so I made this thing.
 http://metal-asylum.net/github/pxlViewer06Updates.gif
 
-Updates to come to slim down the code base when creating executable on Windows.
 For Windows users-
-If you download the repo, copy  `dist/pxlViewer ` to an appropriate location.
-Then delete the extract directory and assign file associations / test by 'Open With . . .'
+If you download the repo, copy `dist/pxlViewer` to an appropriate location.
+Then delete the extract directory and assign file associations / test by '*Open With . . .*'
+pxlViewer is self contained within `dist/pxlViewer`
 
 ______________________________
  How To Use pxlViewer
@@ -66,6 +66,10 @@ Or with a specific file given; currently only relative paths work. Sorry, absolu
 
 ______________________________
  Installation for Windows
+To use the premade executable; copy `dist/pxlViewer` to a desired location
+
+If you want to rebuild the executable for windows, follow the directions below-
+
 What worked for me on Windows 10 -
 Open a Command Prompt, search for  `cmd ` in your windows menu
 Find the  `pip.exe ` in your python folder, copy that path, add  `cd `, then paste into  `cmd `; it should look similar to this-
