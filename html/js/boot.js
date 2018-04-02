@@ -50,7 +50,7 @@ function checkMouse(e){
 		doubleClick=0;
 	}
 	mButton=button;
-//$("#verbText").html(mButton+" - "+button +" -- ");
+//document.getElementById("verbText").innerHTML=mButton+" - "+button +" -- ";
 	if(button == 1){
 		dragging=1;
 		startDrag(curThumb);

@@ -213,7 +213,7 @@ function zoomLayers(id,asset, mPos,cPos,init, zoomOffset){
 		//print("display",displayRatio);
 		if(init==-3){ // Home Image; 100% scale
 			mag=1;//galHeight/imgHeight;
-			placeX=-imgWidth/2 + galHeight/2;//galWidth/2-(imgWidth*mag)/2;
+			placeX=-imgWidth/2 + galWidth/2;//galWidth/2-(imgWidth*mag)/2;
 			placeY=-imgHeight/2 + galHeight/2;
 		}else{ // Fit Image; Scales to window
 			if(imgRatio<displayRatio){ // Set img width to display
@@ -263,10 +263,12 @@ function zoomLayers(id,asset, mPos,cPos,init, zoomOffset){
 		//placeY=Math.max(-cPos[3], Math.min( sH, offY));
 		placeX= offX;
 		placeY= offY;
-		mag=Math.max(.08,mag*curScale);
+		mag=Math.max(minMag,mag*curScale);
 
 		dynScale=mag;
 	}
+	
+	
 	//$("#"+asset).css({"transition": "all .03s linear","-moz-transition": "all .03s linear","-webkit-transition":"all .03s linear","-ms-transition": "all .03s linear","-o-transition": "all .03s linear"});
 	if(!isNaN(mag)){
 		if(mag != minMag){
@@ -467,12 +469,13 @@ function setEntryImage(imgPath, w,h){
 	updateCanvas();
 	resize(0);
 }
-function refreshImage(){
+function refreshImage(){ // Remove resize(0) once inner message windows are implemented
 	var curImg=$("#imgDisp").attr("src");
 	var tm=new Date().getTime();
 	imgPathDate=curImg+"?"+tm;
 	//loadImg(imgPathDate,w,h);
 	$("#imgDisp").attr("src", imgPathDate);
+	resize(0);
 }
 function setEntryText(txt){
 	$("#entryText").text(txt);
@@ -483,7 +486,7 @@ function returnValue(variable,value){
 function returnMessage(msg){
 	opWin.showMessage(msg);
 }
-//Not implimented yet
+//Not implemented yet
 function toggleInfoWindow(){
 	$("#verbText").html(" -  -- ");
 }

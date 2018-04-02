@@ -28,9 +28,10 @@ if %buildrd% equ 1 rd /s /q "build"
 
 :buildPxl
 echo Starting pxlViewer build- %start%
-pyinstaller --noconsole pxlViewer.spec
+pyinstaller pxlViewer.spec
 set end=%time%
 
+:: Didn't know about tokens in batch; or how the for loop stuff worked in batch
 :: Help from- https://stackoverflow.com/questions/673523/how-do-i-measure-execution-time-of-a-command-on-the-windows-command-line
 set token="tokens=1-4 delims=:.,"
 for /f %token% %%a in ("%start%") do set start_h=%%a&set /a start_m=100%%b %% 100&set /a start_s=100%%c %% 100&set /a start_ms=100%%d %% 100
@@ -54,6 +55,7 @@ echo Finished build- %end%
 echo.  
 echo Build executable path-
 echo %CD%\dist\pxlViewer\pxlViewer.exe
+::echo %CD%\dist\pxlViewer.exe
 echo.  
 if %total% lss 60 (
 	echo Time elapsed - %s%.%ms% Seconds

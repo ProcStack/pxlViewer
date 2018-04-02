@@ -1,25 +1,24 @@
+# -*- coding: utf-8 -*-
 ################################################
-## pxlViewer v1.0                             ##
+## pxlViewer v1.1                             ##
 ## Image Viewer                               ##
 ##  Written by Kevin Edzenga; ~2017;2018      ##
 ##   http://Metal-Asylum.net                  ##
 ##                                            ##
-## Updates; March 31, 2018 -- v1.0            ##
-##  pxlViewer released in dedicated repo      ##
+##  If you are a Windows user, check out the  ##
+##    pyinstaller built exe on the repo-      ##
+##       ./dist/pxlViewer/pxlViewer.exe       ##
+##  If you are here to help, I appriciate!    ##
+##  Submit any pulls for review!              ##
 ##                                            ##
-## That being said, the last updates-         ##
-## Updates; March 11, 2018 -- v0.0.6          ##
-##  'Left' key loads previous image in Dir.   ##
-##  'Right' key loads next image in Dir.      ##
-##  Right click zooming too quickly returned  ##
-##    NaN and would break zoom.               ##
-##    It corrects for NaN now.                ##
-##  'F' now toggles full screen image view.   ##
-##  Sped up load time of window.              ##
-##  "Image Info" menu added to display core   ##
-##    data from image; name, res, file size   ##
-##  "Help" menu added to display keyboard     ##
-##    shortcuts; non-active items.            ##
+## Updates; March 31, 2018 -- v1.1            ##
+##  Working on Windows, follow README.md/.txt ##
+##  Fixed Home 'H' alignment issues on images ##
+##   smaller than size of window.             ##
+##  Organized files better for multi-os       ##
+##  Removed needless modules from loading     ##
+##  Random bells, whistles, and bug fixes     ##
+##                                            ##
 ##                                            ##
 ## For aditional work, see my github-         ##
 ##  https://github.com/procstack              ##
@@ -30,19 +29,13 @@
 """
 
 scriptNameText="pxlViewer"
-viewVersion="v1.0"
+viewVersion="v1.1"
 pxlViewerTitleBase=scriptNameText+" "+str(viewVersion)+" - "
 
-import zlib
-import bz2
-
 import sys, os
-from cv2 import *
-import numpy as np
 from PIL import Image
 from PyQt4 import QtGui, QtCore, QtWebKit
 from functools import partial
-import binascii
 import math
 
 frozen=0
@@ -57,17 +50,37 @@ curDir=os.getcwd()
 verbose=0
 loadImgUrl=''
 
+#Find operating system
+#This helped-
+# https://stackoverflow.com/questions/446209/possible-values-from-sys-platform
+platforms={
+	"win32":"win",
+	"linux1":"linux",
+	"linux2":"linux",
+	"darwin":"osx"
+	}
+curOS=sys.platform
+curOS=curOS if curOS not in platforms.keys() else platforms[curOS]
+
+delimit="/"
+if curOS == "win":
+	delimit="\\"
+
+#Find command line arguments
 for arg in sys.argv:
 	if arg in ["-v","-verb", "-verbose"]:
 		verbose=1
 	else:
 		#Dunno when this would ever NEED to be checked, but just to be safe
-		if arg == bundleDir or "/".join(arg.split("/")[:-1]) == bundleDir:
+		if arg == bundleDir or delimit.join(arg.split(delimit)[:-1]) == bundleDir:
 			loadImgUrl=''
 		else:
 			loadImgUrl=arg
 
-if verbose == 0:
+#Only run on Linux
+#Pyinstaller should be handling --noconsole  -or-  exe = EXE( [...] console=False )
+# Spec File - pxlViewer.spec
+if verbose == 0 and curOS != "win":
 	# Fork the python session and close the parent session
 	# Keep terminal active for later usage
 	pid=os.fork()
@@ -76,7 +89,7 @@ if verbose == 0:
 	else:
 		exit()
 
-class ImageProcessor(QtGui.QMainWindow):
+class ImageProcessor(QtGui.QMainWindow): # Main Window
 	def __init__(self, parent=None):
 		super(ImageProcessor,self).__init__(parent)
 		global pxlViewerTitleBase
@@ -98,7 +111,7 @@ class ImageProcessor(QtGui.QMainWindow):
 		self.galleryPath=""
 		self.curEntryObj=-1
 		self.dirImageList={}
-		self.loadIndexList=[]
+		self.loadObjectList=[]
 		self.loadNameList=[]
 		self.loadScrollList=[]
 		self.scrollIndexVal=0
@@ -144,8 +157,8 @@ class ImageProcessor(QtGui.QMainWindow):
 
 		## GUI COMPLETE ##
 		# Load image
-		self.loadAndScanDir(curDir+"/", loadImgUrl)
-	def menuBarVis(self,tgl):
+		self.loadAndScanDir(curDir+delimit, loadImgUrl)
+	def menuBarVis(self,tgl): # Menu Bar, apologies for the "oops" comments, WIP
 		if tgl == 1:
 			### Menu Bar ###
 			try:
@@ -185,7 +198,7 @@ class ImageProcessor(QtGui.QMainWindow):
 				## This is annoying, can't seem to get the commands to run without faulting on menu generation
 				helpMenu=self.menuBar.addMenu('Help')
 				
-				helpText="Space - reset image zoom/position."
+				helpText="Space - resize image to screen; zoom/position."
 				helpItem=QtGui.QAction(helpText,self)
 				#helpItem.triggered.connect(self.editViewWindow.runCommand("resize(0);"))
 				helpMenu.addAction(helpItem)
@@ -221,6 +234,10 @@ class ImageProcessor(QtGui.QMainWindow):
 				helpItem=QtGui.QAction(helpText,self)
 				#helpItem.triggered.connect(self.nextImage())
 				helpMenu.addAction(helpItem)
+				
+				## Failed attemps in driving keyboard functionality
+				##  to command driven by WebView
+				## Functionality will be implimented shortly.
 				"""
 				helpList=[]
 				helpFuncList=[]
@@ -300,15 +317,18 @@ class ImageProcessor(QtGui.QMainWindow):
 		QStatusBar {color:#ffffff;background-color:#606060;border:1px solid #202020;}"""
 		self.setStyleSheet(styleSheetCss)
 	def loadAndScanDir(self, imagePath, imageNameRel):
+		global curOS
+		global delimit
+
 		if imagePath != "":
-			extList=["jpg","jpeg","gif","png", "bmp", "svg"] # Check SVG, since it likes vector postions
+			extList=["jpg","jpeg","gif","png", "bmp"]#, "svg"] # Check SVG, since it likes vector postions
 			activeList=[]
 			if os.path.isdir(imagePath):
 				#Don't think this is working
 				
-				imageName=imagePath.split("/")[-1]
-				imagePath="/".join(imagePath.split("/")[:-1])
-				#self.galleryName=imagePath.split("/")[-1]
+				imageName=imagePath.split(delimit)[-1]
+				imagePath=delimit.join(imagePath.split(delimit)[:-1])
+				#self.galleryName=imagePath.split(delimit)[-1]
 				#self.galleryPath=imagePath
 				imgList=os.listdir(imagePath)
 				for x in imgList:
@@ -317,8 +337,8 @@ class ImageProcessor(QtGui.QMainWindow):
 						activeList.append(x)
 			else:
 				curExt=imagePath.split(".")[-1]
-				imageName=imagePath.split("/")[-1]
-				imagePath="/".join(imagePath.split("/")[:-1])
+				imageName=imagePath.split(delimit)[-1]
+				imagePath=delimit.join(imagePath.split(delimit)[:-1])
 				if curExt.lower() in extList:
 					activeList.append(imageName)
 					
@@ -400,7 +420,7 @@ class ImageProcessor(QtGui.QMainWindow):
 				self.scrollIndexBlock=QtGui.QScrollArea()
 				self.scrollIndexBlock.setWidgetResizable(True)
 				self.scrollIndexBlock.setMaximumWidth(150)
-				self.scrollIndexBlock.verticalScrollBar().valueChanged.connect(self.updateScrollIndex)
+				#self.scrollIndexBlock.verticalScrollBar().valueChanged.connect(self.updateScrollIndex)
 				self.scrollIndexBlock.setHorizontalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOff)
 				scrollInner=QtGui.QWidget(self.scrollIndexBlock)
 				
@@ -415,24 +435,28 @@ class ImageProcessor(QtGui.QMainWindow):
 				size=[100, size.height()]
 				scrollOffset=0
 				scrollAdd=0
-				self.loadIndexList=[]
+				self.loadObjectList=[]
 				self.loadNameList=[]
 				self.loadScrollList=[]
 				loadObj=-1
 				self.curListIndex=-1
+				crossCheck=imageNameRel.split(delimit)[-1]
 				for x,p in enumerate(activeList):
-					scrollOffset+=scrollAdd+pad
+					#scrollOffset+=scrollAdd+pad
 					#IndexImageEntry(parent, index, name, path, scaleSize)
-					curImg=IndexImageEntry(self,x,p,imagePath+"/",size)
+					curImg=IndexImageEntry(self,x,p,imagePath+delimit,size)
 					self.curImgListBlock.addWidget(curImg)
-					curImg.offset=scrollOffset
-					self.loadIndexList.append(curImg)
+					#curImg.offset=scrollOffset
+					self.loadObjectList.append(curImg)
 					self.loadNameList.append(p)
 					self.loadScrollList.append([])
-					self.loadScrollList[-1].append(scrollOffset)
-					self.loadScrollList[-1].append(scrollOffset+curImg.imgSizeIndexList[1])
-					scrollAdd=curImg.imgSizeIndexList[1]
-					if (loadObj==-1 and imageName=='') or p==imageNameRel:
+					self.loadScrollList[-1].append(-1)
+					self.loadScrollList[-1].append(-1)
+					#self.loadScrollList[-1].append(scrollOffset)
+					#self.loadScrollList[-1].append(scrollOffset+curImg.imgSizeIndexList[1])
+					#scrollAdd=curImg.imgSizeIndexList[1]
+					if (loadObj==-1 and imageName=='') or p==crossCheck:
+						curImg.gatherMetaData()
 						loadObj=curImg
 						self.curListIndex=x
 				self.scrollIndexBlock.setWidget(scrollInner)
@@ -459,12 +483,12 @@ class ImageProcessor(QtGui.QMainWindow):
 			popList=[]
 			for x,i in enumerate(self.loadScrollList):
 				if i[0] < maxCheck and i[1] > minCheck:
-					self.loadIndexList[x].loadImage()
+					self.loadObjectList[x].loadImage()
 					popList.append(x)
 			if len(popList) > 0:
 				for p in range(len(popList)): # Delete backwards to not delete the wrong index, since everything falls back 1 on delete
 					rp=len(popList)-1-p
-					del self.loadIndexList[rp]
+					del self.loadObjectList[rp]
 					del self.loadScrollList[rp]
 	def loadImageEntry(self,obj):  # THIS ONLY RUNS ON LAUNCH, NEVER AGAIN
 		global pxlViewerTitleBase
@@ -500,8 +524,10 @@ class ImageProcessor(QtGui.QMainWindow):
 			pass;
 	def prevImage(self): ## Accessed through EntryViewer
 		global pxlViewerTitleBase
-		self.curListIndex=self.curListIndex-1 if (self.curListIndex-1)>=0 else len(self.loadIndexList)-1
-		loadImage=self.loadIndexList[self.curListIndex]
+		self.curListIndex=self.curListIndex-1 if (self.curListIndex-1)>=0 else len(self.loadObjectList)-1
+		loadImage=self.loadObjectList[self.curListIndex]
+		if loadImage.loaded == 0:
+			loadImage.gatherMetaData()
 		self.curEntryObj=loadImage
 		w=loadImage.imgSize[0]
 		h=loadImage.imgSize[1]
@@ -511,8 +537,10 @@ class ImageProcessor(QtGui.QMainWindow):
 		self.setWindowTitle(versionText)
 	def nextImage(self): ## Accessed through EntryViewer
 		global pxlViewerTitleBase
-		self.curListIndex=self.curListIndex+1 if (self.curListIndex+1)!=len(self.loadIndexList) else 0
-		loadImage=self.loadIndexList[self.curListIndex]
+		self.curListIndex=self.curListIndex+1 if (self.curListIndex+1)!=len(self.loadObjectList) else 0
+		loadImage=self.loadObjectList[self.curListIndex]
+		if loadImage.loaded == 0:
+			loadImage.gatherMetaData()
 		self.curEntryObj=loadImage
 		w=loadImage.imgSize[0]
 		h=loadImage.imgSize[1]
@@ -557,7 +585,7 @@ class ImageProcessor(QtGui.QMainWindow):
 		return None
 	def resizeEvent(self, e): ## Resize image to screen, correct for resizing disparity
 		if self.editViewWindow != None:
-			self.editViewWindow.runCommand("resize(0)")
+			self.editViewWindow.runCommand("resize(0);")
 	def quitApp(self):
 		QtGui.qApp.quit()
 class IndexImageEntry(QtGui.QWidget): #Individual indexList image entries
@@ -568,9 +596,10 @@ class IndexImageEntry(QtGui.QWidget): #Individual indexList image entries
 		self.imgName=name
 		self.imgFolder=path
 		self.imgPath=path+name # Path to image on disk
+		self.scaleSize=scaleSize
 		self.loaded=0 # Current state, reading from disk, keeps ram usage and load time lower
 
-		self.fileSize=os.path.getsize(path+"/"+name)
+		self.fileSize=os.path.getsize(path+delimit+name)
 
 		self.imgSize=[-1,-1] # Disk image size
 		self.imgSizeFull=[-1,-1] # Full size image for web
@@ -579,6 +608,7 @@ class IndexImageEntry(QtGui.QWidget): #Individual indexList image entries
 		self.imgSizeThumb=[-1,-1] # Thumb size for web
 		self.imgSizeIndexList=[-1,-1] # Size of indexList image in qt window
 		
+	def gatherMetaData(self):
 		curImgBlock=QtGui.QVBoxLayout()
 		curImgBlock.setSpacing(0) # Spacing & Margin was giving me trouble calculating dynamic loading in window
 		curImgBlock.setMargin(0) # ||
@@ -595,12 +625,12 @@ class IndexImageEntry(QtGui.QWidget): #Individual indexList image entries
 		
 		self.imgSizeIndexList=[imageStats.size[0],imageStats.size[1]]
 		ratio=1
-		if scaleSize[0] < imageStats.size[0]: # If the full image is larger than scrollArea
-			ratio=float(scaleSize[0])/float(imageStats.size[0])
+		if self.scaleSize[0] < imageStats.size[0]: # If the full image is larger than scrollArea
+			ratio=float(self.scaleSize[0])/float(imageStats.size[0])
 			ymath=float(imageStats.size[1])*ratio
-			self.imgSizeIndexList=[int(scaleSize[0]), int(ymath)] # Store indexThumbnail scale for scroll offset math & placeholder
+			self.imgSizeIndexList=[int(self.scaleSize[0]), int(ymath)] # Store indexThumbnail scale for scroll offset math & placeholder
 			
-		self.img.setText("Loading - "+str(self.imgPath.split("/")[-1])+"\n"+str(ratio)[0:5]+"% - [ "+str(self.imgSizeIndexList[0])+" x "+str(self.imgSizeIndexList[1])+" ]") # Stand-in for image, pre load
+		self.img.setText("Loading - "+str(self.imgPath.split(delimit)[-1])+"\n"+str(ratio)[0:5]+"% - [ "+str(self.imgSizeIndexList[0])+" x "+str(self.imgSizeIndexList[1])+" ]") # Stand-in for image, pre load
 		self.img.setAlignment(QtCore.Qt.AlignCenter)
 		self.img.setGeometry(0,0,self.imgSizeIndexList[0],self.imgSizeIndexList[1]) # Placeholder
 		curImgBlock.addWidget(self.img)
@@ -608,6 +638,7 @@ class IndexImageEntry(QtGui.QWidget): #Individual indexList image entries
 		self.setFixedSize(self.imgSizeIndexList[0],self.imgSizeIndexList[1]) # Layout size for Placeholder
 		self.setLayout(curImgBlock) # Layout to display in parent window
 
+		self.loaded=1
 	def loadImage(self):
 		pmap=QtGui.QPixmap()
 		pmap.load(self.imgPath) #Load image, currently disk path only
@@ -631,6 +662,7 @@ class EntryViewer(QtWebKit.QWebView):
 		QtWebKit.QWebView.__init__(self)
 		global bundleDir
 		global verbose
+		global curOS
 		self.entry=entryObj
 		self.win=win
 		self.offset=[]
@@ -643,14 +675,17 @@ class EntryViewer(QtWebKit.QWebView):
 		if verbose:
 			self.verbose=1
 		self.settings().setAttribute(QtWebKit.QWebSettings.JavascriptEnabled, True)
-		self.settings().setUserStyleSheetUrl(QtCore.QUrl.fromLocalFile(bundleDir+"/style.css"))
+		self.settings().setUserStyleSheetUrl(QtCore.QUrl.fromLocalFile(bundleDir+"\html\style.css"))
 		if self.verbose:
 			self.settings().setAttribute(QtWebKit.QWebSettings.DeveloperExtrasEnabled, True)
 		entryText=self.entry.imgName+" - "+str(self.entry.imgSize[0])+"x"+str(self.entry.imgSize[1])
 		
-		with open(bundleDir+'/index.htm', 'r') as htmlOpen:
+		with open(bundleDir+'/html/index.htm', 'r') as htmlOpen:
 			editEntryHtml=htmlOpen.read()
-		self.src=editEntryHtml.format(bdir=bundleDir,relPath=self.entry.imgName,bltext=entryText,imgWidth=str(self.entry.imgSize[0]),imgHeight=str(self.entry.imgSize[1]))
+
+		absPath="file://"+self.entry.imgPath
+		self.src=editEntryHtml.format(bdir=bundleDir+"\html",relPath=self.entry.imgName,bltext=entryText,imgWidth=str(self.entry.imgSize[0]),imgHeight=str(self.entry.imgSize[1]))
+		#self.src=editEntryHtml.format(bdir=bundleDir,relPath=absPath,bltext=entryText,imgWidth=str(self.entry.imgSize[0]),imgHeight=str(self.entry.imgSize[1]))
 		self.setHtml(self.src,baseUrl=QtCore.QUrl().fromLocalFile(self.entry.imgFolder))
 
 		self.page().mainFrame().addToJavaScriptWindowObject("opWin",self)
@@ -664,7 +699,7 @@ class EntryViewer(QtWebKit.QWebView):
 	def runCommand(self,cmd):
 		super(EntryViewer,self).page().mainFrame().evaluateJavaScript(cmd+";")
 	def loadFinished(self, ok):
-		self.runCommand("resize(0)")
+		self.runCommand("resize(0);")
 	def toggleMenuBar(self):
 			self.menuVis=(self.menuVis+1)%2
 			self.win.menuBarVis(self.menuVis)
