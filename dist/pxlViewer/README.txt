@@ -1,4 +1,4 @@
- pxlViewer  v1.0
+ pxlViewer  v1.1
 -----------------------------------
  A PyQt and WebView based image viewer.
 
@@ -9,6 +9,9 @@ I was getting a little tired of the default options in linux; so I made this thi
 http://metal-asylum.net/github/pxlViewer06Updates.gif
 
 Updates to come to slim down the code base when creating executable on Windows.
+For Windows users-
+If you download the repo, copy  `dist/pxlViewer ` to an appropriate location.
+Then delete the extract directory and assign file associations / test by 'Open With . . .'
 
 ______________________________
  How To Use pxlViewer
@@ -40,12 +43,9 @@ Use the  `-debug ` or  `-d ` flag to enter debug mode.  Allows for inspecting th
 
 ______________________________
  Installation for Linux
-Upgrading pip helped the others install correctly
+Upgrading pip helped the other modules install correctly for me
  ` ` `
 python -m pip install --upgrade pip
-pip install numpy
-pip install matplotlib
-pip install opencv-python
 pip install Pillow
 sudo apt-get install python-qt4
  ` ` `
@@ -66,32 +66,25 @@ Or with a specific file given; currently only relative paths work. Sorry, absolu
 
 ______________________________
  Installation for Windows
-Following these insructions only got me so far, but you can find documentation on opencv
-[readthedocs.io - Setup OpenCV in Windows](http://opencv-python-tutroals.readthedocs.io/en/latest/py_tutorials/py_setup/py_setup_in_windows/py_setup_in_windows.html)
-
-
 What worked for me on Windows 10 -
 Open a Command Prompt, search for  `cmd ` in your windows menu
-Find the pip.exe in your python version, copy that path, in  `cmd `, this should look like-
+Find the  `pip.exe ` in your python folder, copy that path, add  `cd `, then paste into  `cmd `; it should look similar to this-
  `cd C:\Python27\Scripts `
-It should move you to the folder-
+Running the command should move you to the folder-
  `C:\Python27\Scripts> `
 
 
-This helped me for installing some packs correctly, update the pip exes; run this-
+This helped me for installing some packs correctly in general, update the pip exes; run this-
  `python -m pip install --upgrade pip `
 
 
-Install dependencies by running-
+Pillow Image Library (PIL) is required to run pxlViewer, install by running-
  ` ` `
-pip install numpy
-pip install matplotlib
-pip install opencv-python
 pip install Pillow
  ` ` `
 
-You'll need to download sip and PyQt4;
-But as of 4/1/2018, there was no exe build for the newest version of PyQt4.12
+You'll need to download SIP and PyQt4;
+But as of 4/1/2018, there was no exe built for the newest version of PyQt4.12
 Sooo, either (1) try an older bundle version, 4.11.4 This worked fine for me -
 https://sourceforge.net/projects/pyqt/files/PyQt4/PyQt-4.11.4/
 
@@ -99,18 +92,17 @@ Or (2) manually set up Sip and PyQt through their source-
 https://riverbankcomputing.com/software/sip/download
 https://riverbankcomputing.com/software/pyqt/download
 
-To test that pxlViewer works, you'll need to navigate to your desired image directory in your Command Prompt by copying the file browser address bar path into  `cmd ` like-
+To test that pxlViewer works, find directory with images by browse to and copy the path into the command prompt, or navigate there in prompt-
  `cd C:\path\to\image\directory `
 
-You can view that directory with-
+You can view the first image in the directory with-
  `python  C:\your\path\to\pxlViewer.py `
 Or view a specific image with-
  `python  C:\your\path\to\pxlViewer.py imageName.ext `
 
 ______________________________
- Build pxlViewer.exe on Windows
+ Making pxlViewer easier to use on Windows: Build pxlViewer.exe on Windows
  Make sure pxlViewer works with no errors from your Command Prompt first!
- (Dedicated Windows exe download in repository to come soon, the exe has some needless bloat currently.)
  If pxlViewer works, to continue you'll need to have pyinstaller installed
 To install pyinstaller, from your python/Scripts folder again-
  `cd C:\Python27\Scripts `
@@ -121,7 +113,7 @@ Then browse to your pxlViewer download/extract folder and double click the  `bui
 This may take a couple minutes to build.
 
 After this, you can right click an image, go to  `Open With... `, and navegate to-
-C:\path\to\pxlViewer\dist\pxlViewer\pxlViewer.exe
+C:\path\to\pxlViewer\\dist\pxlViewer\pxlViewer.exe
 
 If all is well, your image should open with pxlViewer!
 
