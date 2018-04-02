@@ -34,6 +34,7 @@ Hitting  `Spacebar ` or `Return ` will reset the zoom; fitting the image to your
  `F ` toggles full screen.
 
  `Alt key ` toggles menuBar; displays 'File' 'Image Info' and 'Help.
+ `File ` shows `exit`.
  `Image Into ` displays the file name, resolution, and file size of the image.
  `Help ` displays keyboard shortcuts.
 

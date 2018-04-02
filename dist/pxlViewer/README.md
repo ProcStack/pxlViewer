@@ -34,7 +34,8 @@ Hitting **`Spacebar`** or **`Return`** will reset the zoom; fitting the image to
 **`F`** toggles full screen.
 
 **`Alt key`** toggles menuBar; displays 'File' 'Image Info' and 'Help.<br/>
-`Image Into` displays the file name, resolution, and file size of the image.<br/>
+`File` shows `exit`.<br/>
+`Image Info` displays the file name, resolution, and file size of the image.<br/>
 `Help` displays keyboard shortcuts.
 
 Use the **`-debug`** or **`-d`** flag to enter debug mode.  Allows for inspecting the WebView's page; the developer tools window.
