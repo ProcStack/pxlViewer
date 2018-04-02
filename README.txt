@@ -68,6 +68,7 @@ ______________________________
  Installation for Windows
 To use the premade executable; copy `dist/pxlViewer` to a desired location
 Then delete the extract directory and assign file associations / test by 'Open With . . .'
+______________________________
 
 If you want to rebuild the executable for windows, follow the directions below-
 
