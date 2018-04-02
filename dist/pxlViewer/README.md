@@ -11,7 +11,7 @@ http://metal-asylum.net/github/pxlViewer06Updates.gif
 Updates to come to slim down the code base when creating executable on Windows.<br/>
 **For Windows users-**
 If you download the repo, copy `dist/pxlViewer` to an appropriate location.
-Then delete the extract directory and assign file associations / '*Open With . . .*' test.
+Then delete the extract directory and assign file associations / test by  '*Open With . . .*'.
 
 ______________________________
 ## How To Use pxlViewer<br/>
