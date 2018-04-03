@@ -65,7 +65,7 @@ if curOS == "win":
 
 #Find command line arguments
 for arg in sys.argv:
-	if arg in ["-v","-verb", "-verbose"]:
+	if arg in ["-v","-verb", "-verbose", "-d", "-debug"]:
 		verbose=1
 	else:
 		#Dunno when this would ever NEED to be checked, but just to be safe
