@@ -134,12 +134,6 @@ For numbers, check focus is not in text field-
 * document.activeElement
 */
 
-
-/*$(document).on('keypress', function(e){
-	keyHit=e.keyCode || e.which;
-	returnMessage(keyHit);
-});*/
-//document.addEventListener('keypress', function(e){
 document.onkeyup=function(e){
 	keyHit=e.keyCode || e.which;
 	var nullKeys=[9,38,40];

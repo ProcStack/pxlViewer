@@ -14,7 +14,7 @@
 		image-rendering:pixelated;
 		image-rendering:optimize-contrast;
 	}
-	#imgDisp{
+	#imgBlock{
 		user-selection:none;
 		-moz-user-select: none;
 		-webkit-user-select: none;

@@ -16,9 +16,6 @@ Array.prototype.checkAttrs= function(obj){  // Is this even needed?
 
 //Menu display and mointoring
 function menuBarStatus(dist){
-	//menuBarLock=0;
-	//returnMessage("MouseMover"+dist);
-	//returnMessage("toggleMenuBarVis");
 	var perc;
 	if(dist == -1){
 		perc=0;
@@ -33,7 +30,6 @@ function displaywheel(e){
 	getMouseXY(e);
 	var evt=window.event || e 
 	var delta=evt.detail? evt.detail*(-120) : evt.wheelDelta
-	//$("#touchData").html("<span style='color:#ffffff;font-size:150%;'>"+scroller+"  -</span>");
 	scrollGallery(delta,0);
 }
 	
@@ -52,7 +48,7 @@ function scrollGallery(delta, abs){
 	dragDist=scroller;
 	var zoomPerc=delta/10;
 	zoomLayers("touchData", "imgBlock",[],[],-1,zoomPerc);
-	updateCanvas();
+	//updateCanvas();  // Not using the canvas for anything useful yet, turn off updating it
 	return false;
 }
 
@@ -75,31 +71,16 @@ function startDrag() {
 	imgBlockObj.setAttribute('offY',parseInt(imgBlockObj.style.top));
 	imgBlockObj.setAttribute('curSizeW',parseInt(imgBlockObj.offsetWidth));
 	imgBlockObj.setAttribute('curSizeH',parseInt(imgBlockObj.offsetHeight));
-	//$("#imgBlock").attr('offX', parseInt($("#imgBlock").css('left')) );
-	//$("#imgBlock").attr('offY', parseInt($("#imgBlock").css('top')) );
-	//$("#imgBlock").attr('curSizeW', parseInt($("#imgBlock").width()) );
-	//$("#imgBlock").attr('curSizeH', parseInt($("#imgBlock").height()) );
-
-
-	//dragCount=0;
 	
 }
 // Thumbnail Do Drag
 function doDrag() {
 	dragCount+=1;
-	//getMouseXY;
 	
-	//if(Number.isInteger(m)){
-	//	m=[mouseX,mouseY];
-	//}
 	if(mButton == 2){
 		zoomLayers("touchData", "imgBlock",[],[],-1,-1);
-		updateCanvas();
+		//updateCanvas();  // Not using the canvas for anything useful yet, turn off updating it
 	}else{
-		/*var imgW=$("#imgBlock").width();
-		var imgH=$("#imgBlock").height();
-		var imgX=parseInt($("#imgBlock").attr('offX'));
-		var imgY=parseInt($("#imgBlock").attr('offY'));*/
 		var imgW=imgBlockObj.offsetWidth;
 		var imgH=imgBlockObj.offsetHeight;
 		var imgX=parseInt(imgBlockObj.getAttribute('offX'));
@@ -110,28 +91,18 @@ function doDrag() {
 			dragDist=mouseX-origMouseX;
 			calc[0]=(imgX)+xMove;
 			calc[1]=(imgY)+yMove;
-			//$("#imgBlock").css({"left":calc[0],"top":calc[1]});
 			imgBlockObj.style.left=calc[0];
 			imgBlockObj.style.top=calc[1];
 	}
-	/*if(dragging>0){ // Get onmousedrag function to work on entire page, not individual items for setTimeout
-		setTimeout(function(e){doDrag(m)},20);
-	}*/
 }
 // Thumbnail End Drag
 function endDrag() {
-	/*imgBlockObj.setAttribute('offX',parseInt(imgBlockObj.style.left));
+	imgBlockObj.setAttribute('offX',parseInt(imgBlockObj.style.left));
 	imgBlockObj.setAttribute('offY',parseInt(imgBlockObj.style.top));
 	imgBlockObj.setAttribute('curSizeW',parseInt(imgBlockObj.offsetWidth));
 	imgBlockObj.setAttribute('curSizeH',parseInt(imgBlockObj.offsetHeight));
-	imgBlockObj.setAttribute('curScale',dynScale);
-	dragCount=0;*/
-	$("#imgBlock").attr('offX', parseInt($("#imgBlock").css('left')) );
-	$("#imgBlock").attr('offY', parseInt($("#imgBlock").css('top')) );
-	$("#imgBlock").attr('curSizeW', parseInt($("#imgBlock").width()) );
-	$("#imgBlock").attr('curSizeH', parseInt($("#imgBlock").height()) );
+	document.getElementById("touchData").setAttribute('curScale',dynScale);
 	dragCount=0;
-	$("#touchData").attr("curScale", dynScale);
 }
 
 
@@ -144,54 +115,62 @@ function endDrag() {
 // zoomLayers("touchData", "imgBlock",[],[],1,zoomPerc);
 function zoomLayers(id,asset, mPos,cPos,init, zoomOffset){
 	// Gather information about the reference object to move the given asset
-	// This is a cor	relative zooming, based on where the mouse is to the reference object, to zoom the given asset
+	// This is a correlative zooming, based on where the mouse is to the reference object, to zoom the given asset
 	// Separating this allows for different DOM objects to control the zooming object
-	var galWidth=$("#"+id).width();
-	var galHeight=$("#"+id).height();
-	var galPos=$("#"+id).offset();
-	var galTop=galPos.top;
-	var galLeft=galPos.left;
-	var imgPos=$("#"+asset).offset();
-	 var imgLeft=imgPos.left;  // You'll most likely use offset, not absX and absY
-	 var imgTop=imgPos.top;
-	//var imgLeft=$("#"+asset).attr('absX'); // This is specific for this image gallery
-	//var imgTop=$("#"+asset).attr('absY');
-	var imgHeight=parseInt($("#"+asset).attr("heightdef"));
-	var imgWidth=parseInt($("#"+asset).attr("widthdef"));
+	var idObj=document.getElementById(id);
+	var asstObj=document.getElementById(asset);
+	
+	var galWidth=idObj.offsetWidth;
+	var galHeight=idObj.offsetHeight;
+	var galLeft=idObj.offsetLeft;
+	var galTop=idObj.offsetTop;
+	var imgLeft=asstObj.offsetLeft;  // You'll most likely use offset, not absX and absY
+	var imgTop=asstObj.offsetTop;
+	var imgHeight=parseInt(asstObj.getAttribute("heightdef"));
+	var imgWidth=parseInt(asstObj.getAttribute("widthdef"));
 	
 	// Prep zoomable asset
-	if($("#"+asset).css("transform") == null || $("#"+asset).css("transition") == null){ // Asset object; Address transform css requirements
-	    $("#"+asset).css({'transform':'scale(1, 1)','-moz-transform':'scale(1, 1)','-webkit-transform':'scale(1, 1)','-ms-transform':'scale(1, 1)','-o-transform':'scale(1, 1)'});
+	var addAssetCss=0;
+	if(!asstObj.hasAttribute("stye")){
+		addAssetCss=1;
+	}else{
+		if(asstObj.getAttribute("stye").indexOf("transform:") == -1 || asstObj.getAttribute("stye").indexOf("transition:") == -1){ // Asset object; Address transform css requirements
+			addAssetCss=1;
+		}
 	}
-	if($("#"+id).attr('doubleTouch') == null){ // Reference object; Address double click requirements
-		$("#"+id).attr('doubleTouch',0);
+	if(addAssetCss == 1){
+		asstObj.style.transform='scale(1, 1)';
+		asstObj.style.webkitTransform='scale(1, 1)';
+		asstObj.style.MozTransform='scale(1, 1)';
+		asstObj.style.msTransform='scale(1, 1)';
+		asstObj.style.OTransform='scale(1, 1)';
 	}
-	if($("#"+id).attr('curScale') == null){  // Reference object; Address current scale requirements
-		$("#"+id).attr('curScale',1);
+	if(idObj.hasAttribute('doubleTouch') == false){ // Reference object; Address double click requirements
+		idObj.setAttribute('doubleTouch',0);
 	}
-	var curScale=$("#"+id).attr('curScale');
+	if(idObj.hasAttribute('curScale') == false){  // Reference object; Address current scale requirements
+		idObj.setAttribute('curScale',1);
+	}
+	var curScale=idObj.getAttribute('curScale');
 
 	if(isNaN(curScale)){ // Well this is annoying, this should not return NaN, but does on repetative right click
-		curScale=$("#"+asset).height()/imgHeight;
-		$("#"+id).attr('curScale',curScale);
+		curScale=asstObj.offsetHeight/imgHeight;
+		idObj.setAttribute('curScale',curScale);
 	}
 	if(init==-1){
 		mPos=[mouseX,mouseY];
-		//mPos=[mouseX-imgLeft,mouseY-imgTop];
-		//mPos=[mouseX-imgLeft,mouseY-imgTop];
 		
 		// cPos is an array to maintain required math between iterations
 		// Doing it this way allows for additional information without needing to update function calls through out the javascript
 		// cPos = [ Asset left position, Asset top position, Asset width, Asset height ];
-		//cPos=[parseInt($("#"+asset).css('left'))+galLeft,parseInt($("#"+asset).css('top'))+galTop,$("#"+asset).width(),$("#"+asset).height()];
-		cPos=[parseInt($("#"+asset).css('left')),parseInt($("#"+asset).css('top')),$("#"+asset).width(),$("#"+asset).height()];
+		cPos=[parseInt(asstObj.style.offsetLeft),parseInt(asstObj.style.offsetTop),parseInt(asstObj.style.offsetWidth),parseInt(asstObj.style.offsetHeight)];
 		
 		// If you are using the zoom function as a scrolling zoom with middle mouse, this sets to apply a zoom and stop the function
 		// If you have a zoomOffset of -1, its assuming for a click drag zoom
 		// Such as using a wheel to zoom -vs- using two fingers on a phone
 		if(zoomOffset != -1){
 			storeKeyHold=0;
-			$("#"+id).attr('doubleTouch',0);
+			idObj.setAttribute('doubleTouch',0);
 		}
 		init=0;
 	}
@@ -205,15 +184,13 @@ function zoomLayers(id,asset, mPos,cPos,init, zoomOffset){
 			mag=zoomOffset; // Set zoom ammount
 		}
 	}
-	if(($("#"+id).attr('doubleTouch')==1 && Math.abs(mag)<10) || init<=-2){  // Double zoom (Double click, double two-finger tap) to reset zoom
+	if((idObj.getAttribute('doubleTouch')==1 && Math.abs(mag)<10) || init<=-2){  // Double zoom (Double click, double two-finger tap) to reset zoom
 		mag=1;
 		var imgRatio=imgHeight/imgWidth;
 		var displayRatio=galHeight/galWidth;
-		//print("img",imgRatio);
-		//print("display",displayRatio);
 		if(init==-3){ // Home Image; 100% scale
-			mag=1;//galHeight/imgHeight;
-			placeX=-imgWidth/2 + galWidth/2;//galWidth/2-(imgWidth*mag)/2;
+			mag=1;
+			placeX=-imgWidth/2 + galWidth/2;
 			placeY=-imgHeight/2 + galHeight/2;
 		}else{ // Fit Image; Scales to window
 			if(imgRatio<displayRatio){ // Set img width to display
@@ -226,7 +203,6 @@ function zoomLayers(id,asset, mPos,cPos,init, zoomOffset){
 				placeY=0;
 			}
 		}
-		//$("#"+asset).css({'top':'0px','left':'0px'});
 //////////////////////////////////////////////////////////////
 	}else{ // Zoom math
 		if(mButton!= 2){
@@ -244,23 +220,21 @@ function zoomLayers(id,asset, mPos,cPos,init, zoomOffset){
 			mag=Math.sqrt(dx*dx + dy*dy)*(Math.abs(dx)/dx);
 			mag=1-(mag/500);
 			mPos=[origMouseX,origMouseY];
-			cPos[0]=parseInt($("#imgBlock").attr('offX'));
-			cPos[1]=parseInt($("#imgBlock").attr('offY'));
-			cPos[2]=$("#imgBlock").attr('curSizeW');
-			cPos[3]=$("#imgBlock").attr('curSizeH');
+			cPos[0]=parseInt(asstObj.getAttribute('offX'));
+			cPos[1]=parseInt(asstObj.getAttribute('offY'));
+			cPos[2]=asstObj.getAttribute('curSizeW');
+			cPos[3]=asstObj.getAttribute('curSizeH');
 
 		}
 		var curPercX=(mPos[0]-cPos[0])/cPos[2];
 		var curPercY=(mPos[1]-cPos[1])/cPos[3];
 		
 		
-		var origPosX=cPos[2]*curPercX;//(curPercX*(cPos[2]*mag)-cPos[0]*((mag)))/(mag);
-		var origPosY=cPos[3]*curPercY;//(curPercY*(cPos[3]*mag)-cPos[1]*((mag)))/(mag);
-		var offX=-origPosX*mag+mPos[0];//(curPercX*(cPos[2]*curScale)-cPos[0]*curScale)/(mag*curScale);
-		var offY=-origPosY*mag+mPos[1];//(curPercY*(cPos[3]*curScale)-cPos[1]*curScale)/(mag*curScale);
+		var origPosX=cPos[2]*curPercX;
+		var origPosY=cPos[3]*curPercY;
+		var offX=-origPosX*mag+mPos[0];
+		var offY=-origPosY*mag+mPos[1];
 		var mult=Math.sin( Math.min(1,Math.max(0,(mag-curScale)/3)) * (3.14159265/2) );
-		//placeX=Math.max(-cPos[2], Math.min( sW, offX));
-		//placeY=Math.max(-cPos[3], Math.min( sH, offY));
 		placeX= offX;
 		placeY= offY;
 		mag=Math.max(minMag,mag*curScale);
@@ -269,37 +243,35 @@ function zoomLayers(id,asset, mPos,cPos,init, zoomOffset){
 	}
 	
 	
-	//$("#"+asset).css({"transition": "all .03s linear","-moz-transition": "all .03s linear","-webkit-transition":"all .03s linear","-ms-transition": "all .03s linear","-o-transition": "all .03s linear"});
 	if(!isNaN(mag)){
 		if(mag != minMag){
-			//tickVerboseCounter();
-			//$("#verbText").html(mag+" - "+curScale+" -- "+minMag);
-			$("#"+asset).css({'left':(placeX)+'px','top':(placeY)+'px'});
-			$("#"+asset).css({'height':(imgHeight*mag)+'px','width':(imgWidth*mag)+'px'});
+			asstObj.style.left=(placeX)+'px';
+			asstObj.style.top=(placeY)+'px';
+			asstObj.style.height=(imgHeight*mag)+'px';
+			asstObj.style.width=(imgWidth*mag)+'px';
 		}
-		//$("#"+asset).css({'transform':'scale('+mag+', '+mag+')','-moz-transform':'scale('+mag+', '+mag+')','-webkit-transform':'scale('+mag+', '+mag+')','-ms-transform':'scale('+mag+', '+mag+')','-o-transform':'scale('+mag+', '+mag+')'});
-	
-		$("#scaleText").text((parseInt(mag*100*100)/100)+" %");
+		document.getElementById("scaleText").innerText=((parseInt(mag*100*100)/100)+" %");
 	}
-	if(storeKeyHold==1 && $("#"+id).attr('doubleTouch')==0){
+	
+	if(storeKeyHold==1 && document.getElementById(id).getAttribute('doubleTouch')==0){
 		setTimeout(function(){zoomLayers(id,asset, mPos,cPos,init, zoomOffset);},100);
 	}else{
 		dynScale=mag;
 		if(Math.abs(curScale-mag)<.05){
-			$("#"+id).attr('doubleTouch',0);
+			document.getElementById(id).setAttribute('doubleTouch',0);
 		}
 		if(mButton!=2 && !isNaN(mag)){
-			$("#"+id).attr('curScale',mag);
+			document.getElementById(id).setAttribute('curScale',mag);
 		}
 	}
 }
 function tickVerboseCounter(){
-	var curcount=$("#verbText").text();
+	var curcount=document.getElementById("verbText").textContent;
 	if(curcount==""){
 		curcount=0;
 	}
 	curcount=parseInt(curcount)+1;
-	$("#verbText").html(curcount);
+	document.getElementById("verbText").innerHTML=curcount;
 }
 
 function print(){
@@ -316,28 +288,43 @@ function print(){
 function resize(full){
 	var sW=window.innerWidth;
 	var sH=window.innerHeight;
-	var pwidth=$(document).width();
-	var pheight=$(document).height();
+	var pwidth=document.documentElement.clientWidth;
+	var pheight=document.documentElement.clientHeight;
 	var valW,valH,valLeft,valTop;
-	lw=$("#imgBlock").width();
-	lh=$("#imgBlock").height();
+	var imgBlockObj=document.getElementById("imgBlock");
+	lw=imgBlockObj.offsetWidth;
+	lh=imgBlockObj.offsetHeight;
 	
-	$("#viewPane").css({"height":pheight,"width":pwidth, "left":"0", "top":"0"});
+	var viewPaneObj=document.getElementById("viewPane");
+	viewPaneObj.style.height=pheight;
+	viewPaneObj.style.width=pwidth;
+	viewPaneObj.style.left="0";
+	viewPaneObj.style.top="0";
 
-	var iheight=$("#imgBlock").height();
+	var iheight=imgBlockObj.offsetHeight	;
 	var topMove=Math.max(0,parseInt((pheight-iheight)/2));
 	////
-	$("#imgBlock").css({"width":lw,"height":lh,"top":valTop,"left":valLeft,"visibility":"visible"});
-	$("#imgDisp").css({"visibility":"visible"});
-	//$("#imgBlock").attr({"widthDef":lw,"heightDef":lh,"topDef":0,"leftDef":0});
-	$("#imgBlock").attr({"topDef":0,"leftDef":0});
+	imgBlockObj.style.width=lw;
+	imgBlockObj.style.height=lh;
+	imgBlockObj.style.top=valTop;
+	imgBlockObj.style.left=valLeft;
+	imgBlockObj.style.visibility="visible";
+	imgBlockObj.setAttribute("topDef",0);
+	imgBlockObj.setAttribute("leftDef",0);
 	
-	$("#touchData").css({"width":pwidth,"height":pheight,"left":"0","top":"0"}); 
+	var touchDataObj=document.getElementById("touchData");
+	touchDataObj.style.width=pwidth;
+	touchDataObj.style.height=pheight;
+	touchDataObj.style.left="0";
+	touchDataObj.style.top="0"; 
+	
 	origImgW=valW;
 	origImgH=valH;
-	var pos=$("#imgBlock").position();
-	origImgX=pos.left;
-	origImgY=pos.top;
+	origImgX=imgBlockObj.offsetLeft;
+	origImgY=imgBlockObj.offsetTop;
+	//var pos=imgBlockObj.getBoundingClientRect();
+	//origImgX=pos.left;
+	//origImgY=pos.top;
 	curScale=1;
 	if(full == 0){
 		zoomLayers("touchData", "imgBlock",[],[],-2,0);
@@ -345,57 +332,6 @@ function resize(full){
 		zoomLayers("touchData", "imgBlock",[],[],-3,0);
 	}
 }
-function loadImg(url,lw,lh){
-	//resetZoomPan();
-	//var tempPrevThumb=updateThumbs(id);
-	var pwidth=$(document).width();
-	var pheight=$(document).height();
-	var paneRatio=pwidth/pheight;
-	var valW,valH,valLeft,valTop;
-	var src,mid,url;
-	
-	
-	//altText=$("#"+id).attr("alt");
-	var imgRatio=lw/lh;
-	//alert("#"+id+"-"+url+"-"+lw+"-"+lh);
-
-	//$("#viewPane").html("<div id='imgBlock' style=\"background-image:url('"+src+"');background-size:cover;-webkit-background-size: cover;-moz-background-size:cover;-o-background-size:cover;width:"+lw+";height:"+lh+";position:absolute;top:"+valTop+";left:"+valLeft+";border:0;\" widthdef='"+lw+"' heightdef="+lh+"' topDef='0' leftDef='0' absX='0' absY='0' offX='0' offY='0' url='"+url+"'><img id='imgSource' src='"+mid+"' height='100%' width='100%'></div>");
-	$("#viewPane").html("<div id='imgDisp' style=\"width:"+lw+";height:"+lh+";position:absolute;top:"+valTop+";left:"+valLeft+";border:0;\" widthdef='"+lw+"' heightdef="+lh+"' topDef='0' leftDef='0' absX='0' absY='0' offX='0' offY='0'><img id='imgSource' src='"+url+"' height='100%' width='100%'></div>");
-	//$("#viewPane").attr("curImg", id);
-	//window.location.replace("#"+id);
-	var imgPos=$("#imgBlock").offset();
-	var imgLeft=imgPos.left;
-	var imgTop=imgPos.top;
-	$("#imgBlock").attr({'absX':imgLeft,'absY':imgTop});
-
-	
-	origImgW=valW;
-	origImgH=valH;
-	curScale=1;
-	//updateGalleryText(altText,url);
-	
-	zoomLayers("touchData", "imgBlock",[],[],-2,0);
-}
-
-//window.onresize=function(event){resize(0);}
-
-//
-// For letting up of key
-/*
-storeKeyHold=0;
-if(storeKeyHit==0){
-	resetColorSphere('colorSphereCanvas',1,1);
-}
-storeKeyHit=0;
- 
-// For holding the key
-
-if(storeKeyHold==0){
-	storeKeyHold=1;
-	keyHoldCheck("resetColorSphere('colorSphereCanvas',1,0);");
-}
-*/			
-//
 
 function keyHoldCheck(runFunc){
 	if(storeKeyHold>0){
@@ -410,20 +346,37 @@ function keyHoldCheck(runFunc){
 }
 
 function resetZoomPan(){
-	var id="touchData";
-	var asset="imgBlock";
-	var canvas="imgOverlay";
-	$("#"+id).attr('doubleTouch',0);
-	$("#"+id).attr('curScale',1);
-    $("#"+asset).css({'transform':'scale(1, 1)','-moz-transform':'scale(1, 1)','-webkit-transform':'scale(1, 1)','-ms-transform':'scale(1, 1)','-o-transform':'scale(1, 1)'});
-	$("#"+asset).css({'left':parseInt($("#"+asset).attr("leftDef"))+'px','top':parseInt($("#"+asset).attr("topDef"))+'px'});
-    $("#"+canvas).css({'transform-origin':'top left', 'transform':'scale(1, 1)','-moz-transform':'scale(1, 1)','-webkit-transform':'scale(1, 1)','-ms-transform':'scale(1, 1)','-o-transform':'scale(1, 1)'});
+	var idObj=document.getElementById("touchData");
+	var asstObj=document.getElementById("imgBlock");
+	var canvasObj=document.getElementById("imgOverlay");
+	idObj.setAttribute('doubleTouch',0);
+	idObj.setAttribute('curScale',1);
+
+	asstObj.style.transform='scale(1, 1)';
+	asstObj.style.webkitTransform='scale(1, 1)';
+	asstObj.style.MozTransform='scale(1, 1)';
+	asstObj.style.msTransform='scale(1, 1)';
+	asstObj.style.OTransform='scale(1, 1)';
+	asstObj.style.left=parseInt(asstObj.getAttribute("leftDef"))+'px';
+	asstObj.style.top=parseInt(asstObj.getAttribute("topDef"))+'px';
+
+	canvasObj.style.transformOrigin='top left';
+	canvasObj.style.transform='scale(1, 1)';
+	canvasObj.style.webkitTransform='scale(1, 1)';
+	canvasObj.style.MozTransform='scale(1, 1)';
+	canvasObj.style.msTransform='scale(1, 1)';
+	canvasObj.style.OTransform='scale(1, 1)';
 
 }
 function updateCanvas(){
-	var curScale=parseFloat($("#touchData").attr('curScale'));
-	var canvas="imgOverlay";
-    $("#"+canvas).css({'transform-origin':'top left','transform':'scale('+curScale+', '+curScale+')','-moz-transform':'scale('+curScale+', '+curScale+')','-webkit-transform':'scale('+curScale+', '+curScale+')','-ms-transform':'scale('+curScale+', '+curScale+')','-o-transform':'scale('+curScale+', '+curScale+')'});
+	var curScale=parseFloat(document.getElementById("touchData").getAttribute('curScale'));
+	var canvas=document.getElementById("imgOverlay");
+	canvas.style.transformOrigin='top left'
+	canvas.style.transform='scale('+curScale+', '+curScale+')';
+	canvas.style.webkitTransform='scale('+curScale+', '+curScale+')';
+	canvas.style.MozTransform='scale('+curScale+', '+curScale+')';
+	canvas.style.msTransform='scale('+curScale+', '+curScale+')';
+	canvas.style.OTransform='scale('+curScale+', '+curScale+')';
 	
 }
 // Function for timed countdown to run a function; used for double click detection on this site
@@ -438,27 +391,26 @@ function countdown(func,countDown){
 }
 
 function checkExt(){
-	imgPath=$("#imgDisp").attr("src");
-	//$("#verbText").html(" - "+imgPath +" -- ");
+	imgPath=document.getElementById("imgBlock").getAttribute("src");
 }
 
 function setEntryImage(imgPath, w,h){
 	imgPathDate=imgPath+"?"+new Date().getTime();
 	
-	$("#imgBlock").attr("src", imgPath);
-	$("#imgBlock").css({"width":w,"height":h});
-	$("#imgBlock").attr("widthDef", w);
-	$("#imgBlock").attr("heightDef", h);
-		
-	$("#imgDisp").attr("src", imgPathDate);
-	$("#imgDisp").attr("widthDef", w);
-	$("#imgDisp").attr("heightDef", h);
+	var curObj=document.getElementById("imgBlock");
+	curObj.setAttribute("src", imgPath);
+	curObj.style.backgroundImage="url('"+imgPathDate+"')";
+	curObj.style.width=w;
+	curObj.style.height=h;
+	curObj.setAttribute("widthDef", w);
+	curObj.setAttribute("heightDef", h);
 			
-	$("#imgOverlay").css({"width":w,"height":h});
-	$("#imgOverlay").attr("widthDef", w);
-	$("#imgOverlay").attr("heightDef", h);
+	curObj=document.getElementById("imgOverlay");
+	curObj.style.width=w;
+	curObj.style.height=h;
+	curObj.setAttribute("widthDef", w);
+	curObj.setAttribute("heightDef", h);
 
-	//loadImg(imgPathDate,w,h);
 	var imgName=imgPath.split("/")
 	imgName=imgName[imgName.length-1];
 	imgName+=" - ";
@@ -466,19 +418,20 @@ function setEntryImage(imgPath, w,h){
 	setEntryText(imgName);
 	
 	resetZoomPan();
-	updateCanvas();
+	//updateCanvas();  // Not using the canvas for anything useful yet, turn off updating it
 	resize(0);
 }
 function refreshImage(){ // Remove resize(0) once inner message windows are implemented
-	var curImg=$("#imgDisp").attr("src");
+	var curObj=document.getElementById("imgBlock");
+	var curImg=curObj.getAttribute("src");
 	var tm=new Date().getTime();
 	imgPathDate=curImg+"?"+tm;
-	//loadImg(imgPathDate,w,h);
-	$("#imgDisp").attr("src", imgPathDate);
+	curObj.setAttribute("src", imgPathDate);
+	curObj.style.backgroundImage="url('"+imgPathDate+"')";
 	resize(0);
 }
 function setEntryText(txt){
-	$("#entryText").text(txt);
+	document.getElementById("entryText").innerHTML=txt;
 }
 function returnValue(variable,value){
 	opWin.varValue("["+variable+","+value+"]");
@@ -488,7 +441,7 @@ function returnMessage(msg){
 }
 //Not implemented yet
 function toggleInfoWindow(){
-	$("#verbText").html(" -  -- ");
+	document.getElementById("verbText").innerHTML=" -  -- ";
 }
 
 //////////////////////////////////////////////////////////////////////

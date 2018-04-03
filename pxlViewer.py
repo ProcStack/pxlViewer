@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 ################################################
-## pxlViewer v1.1                             ##
+## pxlViewer v1.2                             ##
 ## Image Viewer                               ##
 ##  Written by Kevin Edzenga; ~2017;2018      ##
 ##   http://Metal-Asylum.net                  ##
@@ -11,13 +11,12 @@
 ##  If you are here to help, I appriciate!    ##
 ##  Submit any pulls for review!              ##
 ##                                            ##
-## Updates; March 31, 2018 -- v1.1            ##
-##  Working on Windows, follow README.md/.txt ##
-##  Fixed Home 'H' alignment issues on images ##
-##   smaller than size of window.             ##
-##  Organized files better for multi-os       ##
-##  Removed needless modules from loading     ##
-##  Random bells, whistles, and bug fixes     ##
+## Updates; April 3, 2018 -- v1.2             ##
+##  Bug finding local directory fixed;        ##
+##    Only affected 'Open With...' on Windows ##
+##  Removed all JQuery                        ##
+##  Removed some bloat and 'oops' comments    ##
+##  Now supports relative and absolute paths  ##
 ##                                            ##
 ##                                            ##
 ## For aditional work, see my github-         ##
@@ -29,7 +28,7 @@
 """
 
 scriptNameText="pxlViewer"
-viewVersion="v1.1"
+viewVersion="v1.2"
 pxlViewerTitleBase=scriptNameText+" "+str(viewVersion)+" - "
 
 import sys, os
@@ -44,8 +43,6 @@ if getattr(sys, 'frozen', False):
 	bundleDir=sys._MEIPASS
 else:
 	bundleDir=os.path.dirname(os.path.abspath(__file__))
-
-curDir=os.getcwd()
 
 verbose=0
 loadImgUrl=''
@@ -76,6 +73,14 @@ for arg in sys.argv:
 			loadImgUrl=''
 		else:
 			loadImgUrl=arg
+			loadImgUrl=os.path.abspath(loadImgUrl)
+#Unsure if this will break anything on linux side, but windows was returning C:\windows\system32 when running through "Open With..."
+#Force current directory to image directory
+if loadImgUrl != '':
+	curDir=os.path.dirname(loadImgUrl)
+	os.chdir(curDir)
+else: # This has the potential to error out when launching through 'Open With...' where pxlViewer isn't the defualt associated program
+	curDir=os.getcwd()
 
 #Only run on Linux
 #Pyinstaller should be handling --noconsole  -or-  exe = EXE( [...] console=False )
@@ -464,7 +469,6 @@ class ImageProcessor(QtGui.QMainWindow): # Main Window
 				self.imageDisplayBlock.addLayout(entryBlock)
 				#self.updateScrollIndex() ## Load thumbnails of images in the gallery viewer
 				self.loadImageEntry(loadObj)
-				self.updateImageInfoMenu(loadObj)
 	def setOutputDir(self):
 		folderPicker=QtGui.QFileDialog.getExistingDirectory(self,"Set Output Directory")
 		if folderPicker != "":
@@ -531,7 +535,8 @@ class ImageProcessor(QtGui.QMainWindow): # Main Window
 		self.curEntryObj=loadImage
 		w=loadImage.imgSize[0]
 		h=loadImage.imgSize[1]
-		self.editViewWindow.setImage(loadImage.imgName,w,h)
+		self.editViewWindow.setImage(loadImage.scrPath,w,h)
+		
 		self.updateImageInfoMenu(loadImage)
 		versionText=pxlViewerTitleBase+str(loadImage.imgName)
 		self.setWindowTitle(versionText)
@@ -544,7 +549,7 @@ class ImageProcessor(QtGui.QMainWindow): # Main Window
 		self.curEntryObj=loadImage
 		w=loadImage.imgSize[0]
 		h=loadImage.imgSize[1]
-		self.editViewWindow.setImage(loadImage.imgName,w,h)
+		self.editViewWindow.setImage(loadImage.scrPath,w,h)
 		self.updateImageInfoMenu(loadImage)
 		versionText=pxlViewerTitleBase+str(loadImage.imgName)
 		self.setWindowTitle(versionText)
@@ -596,6 +601,8 @@ class IndexImageEntry(QtGui.QWidget): #Individual indexList image entries
 		self.imgName=name
 		self.imgFolder=path
 		self.imgPath=path+name # Path to image on disk
+		self.scrPath=("file:///"+path+name).replace("\\", "/") # Path to image on disk
+		
 		self.scaleSize=scaleSize
 		self.loaded=0 # Current state, reading from disk, keeps ram usage and load time lower
 
@@ -683,9 +690,9 @@ class EntryViewer(QtWebKit.QWebView):
 		with open(bundleDir+'/html/index.htm', 'r') as htmlOpen:
 			editEntryHtml=htmlOpen.read()
 
-		absPath="file://"+self.entry.imgPath
-		self.src=editEntryHtml.format(bdir=bundleDir+"\html",relPath=self.entry.imgName,bltext=entryText,imgWidth=str(self.entry.imgSize[0]),imgHeight=str(self.entry.imgSize[1]))
-		#self.src=editEntryHtml.format(bdir=bundleDir,relPath=absPath,bltext=entryText,imgWidth=str(self.entry.imgSize[0]),imgHeight=str(self.entry.imgSize[1]))
+		absPath=self.entry.scrPath
+		self.src=editEntryHtml.format(bdir="file:///"+bundleDir.replace("\\","/")+"/html",relPath=self.entry.scrPath,bltext=entryText,imgWidth=str(self.entry.imgSize[0]),imgHeight=str(self.entry.imgSize[1]))
+		#self.src=editEntryHtml.format(bdir="file:///"+bundleDir.replace("\\","/"),relPath=absPath,bltext=entryText,imgWidth=str(self.entry.imgSize[0]),imgHeight=str(self.entry.imgSize[1]))
 		self.setHtml(self.src,baseUrl=QtCore.QUrl().fromLocalFile(self.entry.imgFolder))
 
 		self.page().mainFrame().addToJavaScriptWindowObject("opWin",self)

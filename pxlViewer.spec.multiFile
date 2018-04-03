@@ -6,7 +6,6 @@ addedData = {
 			('README.md','.'),
 			('README.txt','.'),
 			('html\\index.htm','html\\.'),
-			('html\\jquery-3.2.1.min.js','html\\.'),
 			('html\\style.css','html\\.'),
 			('html\\js\\*.js','html\\js'),
 			}

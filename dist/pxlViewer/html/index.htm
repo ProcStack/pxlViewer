@@ -1,9 +1,6 @@
-
 <!DOCTYPE >
 <html lang="en">
 <head>
-
-<script type="text/javascript" src="{bdir}/jquery-3.2.1.min.js"></script>
 <script type="text/javascript" src="{bdir}/js/variables.js"></script>
 <script type="text/javascript" src="{bdir}/js/boot.js"></script>
 <script type="text/javascript" src="{bdir}/js/interface.js"></script>
@@ -11,8 +8,7 @@
 <body onload="init();returnMessage('loaded');">
 	
 	<div id="viewPane" style="height:100;width:100;overflow:hidden;position:fixed;top:0px;right:0px;z-index:5;" curImg="img1">
-		<div id="imgBlock" src="{relPath}" style="height:{imgHeight};width:{imgWidth};"widthDef="{imgWidth}" heightDef="{imgHeight}">
-			<img id="imgDisp" src="{relPath}" style="height:100%;width:100%;z-index:1;"widthDef="{imgWidth}" heightDef="{imgHeight}">
+		<div id="imgBlock" src="{relPath}" style="height:{imgHeight};width:{imgWidth};background-image:url('{relPath}');background-size:100% 100%;" widthDef="{imgWidth}" heightDef="{imgHeight}">
 			<canvas id="imgOverlay" style="height:{imgHeight};width:{imgWidth};z-index:2;position:absolute; top:0px; left:0px;"widthDef="{imgWidth}" heightDef="{imgHeight}"></canvas>
 		</div>
 	</div>
