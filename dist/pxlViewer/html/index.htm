@@ -7,24 +7,40 @@
 </head>
 <body onload="init();returnMessage('loaded');">
 	
-	<div id="viewPane" style="height:100;width:100;overflow:hidden;position:fixed;top:0px;right:0px;z-index:5;" curImg="img1">
+	<div id="viewPane" style="height:100;width:100;position:fixed;top:0px;right:0px;z-index:5;" curImg="img1">
 		<div id="imgBlock" src="{relPath}" style="height:{imgHeight};width:{imgWidth};background-image:url('{relPath}');background-size:100% 100%;" widthDef="{imgWidth}" heightDef="{imgHeight}">
-			<canvas id="imgOverlay" style="height:{imgHeight};width:{imgWidth};z-index:2;position:absolute; top:0px; left:0px;"widthDef="{imgWidth}" heightDef="{imgHeight}"></canvas>
+			<canvas id="imgOverlay" style="height:{imgHeight};width:{imgWidth};z-index:2;position:absolute; top:0px; left:0px;" widthDef="{imgWidth}" heightDef="{imgHeight}"></canvas>
+			<canvas id="imgCurEditOverlay" style="height:{imgHeight};width:{imgWidth};z-index:3;position:absolute; top:0px; left:0px;" widthDef="{imgWidth}" heightDef="{imgHeight}"></canvas>
+			<div id="markerTemplate-vertical" style="visibility:hidden;">
+				<div style="height:100%;position:absolute;top:0px;left:0px">
+					<div class="close" style="height:20px;width:20px;position:absolute;top:-25px;left:-7px;overflow:hidden;border:1px solid #cccccc;color:#cccccc;margin-top:auto;margin-bottom:auto;text-align:center;">X</div>
+					<div class="coord" style="height:100%;width:10px;position:absolute;top:0px;left:0px;overflow:hidden;"><div class="coord" style="height:100%;width:2px;position:absolute;top:0px;left:5px;overflow:hidden;background-color:rgba(150,150,150,.5);">&nbsp;</div></div>
+					<div class="perc" style="height:30px;width:100px;position:absolute;bottom:-30px;left:-7px;">##%</div>
+				</div>
+			</div>
+			<div id="markerTemplate-horizontal" style="visibility:hidden;">
+				<div style="width:100%;position:absolute;top:0px;left:0px">
+					<div class="close" style="height:20px;width:20px;position:absolute;top:-7px;left:-25px;overflow:hidden;border:1px solid #cccccc;color:#cccccc;margin-top:auto;margin-bottom:auto;text-align:center;">X</div>
+					<div class="coord" style="height:10px;width:100%;position:absolute;top:0px;left:0px;overflow:hidden;"><div style="height:2px;width:100%;position:absolute;top:5px;left:0px;overflow:hidden;background-color:rgba(150,150,150,.5);">&nbsp;</div></div>
+					<div class="perc" style="height:30px;width:100px;position:absolute;top:-7px;right:-100px;">##%</div>
+				</div>
+			</div>
+			<div id="mouseCoordParent"></div>
 		</div>
 	</div>
-	<div id="touchData" style="overflow:hidden;position:fixed;top:0;left:0;height:100;width:100;cursor:hand; z-index:100;" >
+	<div id="touchData" style="position:fixed;top:0;left:0;height:100;width:100; z-index:1;" >
 		&nbsp;
 	</div>
 	<div id="entryText" class="shadowFont" style="position:fixed;bottom:0px;left:0px;z-index:10">
-	{bltext}
+		{bltext}
 	</div>
 	<div id="scaleText" class="shadowFont" style="position:fixed;bottom:0px;right:0px;z-index:11">
-	100 %
+		<span id="scaleRes"></span> - <span id="scalePerc">100 %</span>
 	</div>
 	<div id="verbText" class="shadowFont" style="position:fixed;top:0px;left:0px;z-index:12">
 	</div>
 	<div id="menuToggleButton" class="shadowFont" style="position:fixed;top:0px;left:0px;z-index:20;height:5px;width:100%;">
-	&nbsp;
+		&nbsp;
 	</div>
 	
 </body>

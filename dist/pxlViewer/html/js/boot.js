@@ -8,7 +8,9 @@ function init(){
 	
 	checkExt();
 	
+	touchDataObj=document.getElementById("touchData");
 	imgBlockObj=document.getElementById("imgBlock");
+	imgOverlayObj=document.getElementById("imgOverlay");
 	var attribList=['offX','offY','curSizeW','curSizeH',"curScale"];
 	attribList.checkAttrs("imgBlock");
 	resize(0);
@@ -55,7 +57,7 @@ function checkMouse(e){
 		dragging=1;
 		startDrag(curThumb);
 		if(doubleClick==1){
-			zoomLayers("touchData", "imgBlock",[],[],-2,0);
+			zoomLayers("touchData", ["imgBlock","imgOverlay"],[],[],-2,0);
 			updateCanvas();
 		}
 		if(doubleClick==0){
@@ -174,6 +176,11 @@ document.onkeyup=function(e){
 	// Alt
 	if(keyHit == 18){
 		returnMessage("toggleMenuBarVis");
+		return false;
+	}
+	// Del
+	if(keyHit == 46){
+		document.getElementById("coord_"+mouseCoordCur).remove();
 		return false;
 	}
 };
