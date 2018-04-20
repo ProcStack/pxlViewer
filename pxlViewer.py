@@ -1,35 +1,41 @@
 # -*- coding: utf-8 -*-
-################################################
-## pxlViewer v1.2                             ##
-## Image Viewer                               ##
-##  Written by Kevin Edzenga; ~2017;2018      ##
-##   http://Metal-Asylum.net                  ##
-##                                            ##
-##  If you are a Windows user, check out the  ##
-##    pyinstaller built exe on the repo-      ##
-##       ./dist/pxlViewer/pxlViewer.exe       ##
-##  If you are here to help, I appriciate!    ##
-##  Submit any pulls for review!              ##
-##                                            ##
-## Updates; April 3, 2018 -- v1.2             ##
-##  Bug finding local directory fixed;        ##
-##    Only affected 'Open With...' on Windows ##
-##  Removed all JQuery                        ##
-##  Removed some bloat and 'oops' comments    ##
-##  Now supports relative and absolute paths  ##
-##                                            ##
-##                                            ##
-## For aditional work, see my github-         ##
-##  https://github.com/procstack              ##
-################################################
+###################################################
+## pxlViewer v1.2                                ##
+## Image Viewer                                  ##
+##  Written by Kevin Edzenga; ~2017;2018         ##
+##   http://Metal-Asylum.net                     ##
+##                                               ##
+##  If you are a Windows user, check out the     ##
+##    pyinstaller built exe on the repo-         ##
+##       ./dist/pxlViewer/pxlViewer.exe          ##
+##  If you are here to help, I appriciate!       ##
+##  Submit any pulls for review!                 ##
+##                                               ##
+## Updates; April 3, 2018 -- v1.2                ##
+##  Boosted load time, and perception;           ##
+##    Open window before any image reads         ##
+##    Load image, wait for loaded signal-        ##
+##     Directory scan and gather gallery data    ##
+##  Mouse Coords can be created;                 ##
+##   Middle mouse drag from off image, in        ##
+##   Coords display Pixle and % from image edge  ##
+##   Move by clicking and dragging on them       ##
+##   Remove by hitting the [X] off image's edge  ##
+##  Save Scaled Image option                     ##
+##  Scaled resolution displayed in window        ##
+##                                               ##
+##                                               ##
+## For aditional work, see my github-            ##
+##  https://github.com/procstack                 ##
+###################################################
 
 """
  Learning should be a shared experiance
 """
 
-scriptNameText="pxlViewer"
+scriptNameText="PXL Viewer"
 viewVersion="v1.2"
-pxlViewerTitleBase=scriptNameText+" "+str(viewVersion)+" - "
+pxlViewerTitleBase=scriptNameText+" | "
 
 import sys, os
 from PIL import Image
@@ -62,10 +68,14 @@ curOS=curOS if curOS not in platforms.keys() else platforms[curOS]
 delimit="/"
 if curOS == "win":
 	delimit="\\"
+	import ctypes
+	idBase=scriptNameText+viewVersion+".pxlViewerAppId"
+	pxlViewerId=idBase.decode("utf-8")
+	ctypes.windll.shell32.SetCurrentProcessExplicitAppUserModelID(pxlViewerId)
 
 #Find command line arguments
 for arg in sys.argv:
-	if arg in ["-v","-verb", "-verbose", "-d", "-debug"]:
+	if arg in ["-v","-verb", "-verbose"]:
 		verbose=1
 	else:
 		#Dunno when this would ever NEED to be checked, but just to be safe
@@ -93,6 +103,11 @@ if verbose == 0 and curOS != "win":
 		os.setsid()
 	else:
 		exit()
+		
+
+# Qt Cursor resource-
+# http://ftp.ics.uci.edu/pub/centos0/ics-custom-build/BUILD/PyQt-x11-gpl-4.7.2/doc/html/qcursor.html
+		
 
 class ImageProcessor(QtGui.QMainWindow): # Main Window
 	def __init__(self, parent=None):
@@ -107,6 +122,19 @@ class ImageProcessor(QtGui.QMainWindow): # Main Window
 		self.setMinimumSize(self.winSize[0]*.2,self.winSize[1]*.2)
 		self.resize(self.winSize[0],self.winSize[1])
 		#self.setStyleSheet("padding:0px;")	
+		
+		# Set icons
+		iconSource=QtGui.QIcon()
+		iconSource.addFile(bundleDir+delimit+"data"+delimit+"pxlViewer_icon16.png", QtCore.QSize(16,16))
+		iconSource.addFile(bundleDir+delimit+"data"+delimit+"pxlViewer_icon24.png", QtCore.QSize(24,24))
+		iconSource.addFile(bundleDir+delimit+"data"+delimit+"pxlViewer_icon32.png", QtCore.QSize(32,32))
+		iconSource.addFile(bundleDir+delimit+"data"+delimit+"pxlViewer_icon48.png", QtCore.QSize(48,48))
+		iconSource.addFile(bundleDir+delimit+"data"+delimit+"pxlViewer_icon64.png", QtCore.QSize(64,64))
+		iconSource.addFile(bundleDir+delimit+"data"+delimit+"pxlViewer_icon128.png", QtCore.QSize(128,128))
+		iconSource.addFile(bundleDir+delimit+"data"+delimit+"pxlViewer_icon256.png", QtCore.QSize(256,256))
+		iconSource.addFile(bundleDir+delimit+"data"+delimit+"pxlViewerIcon.ico")
+		#iconSource.addFile(bundleDir+delimit+"data"+delimit+"pxlViewer_icon_full.png", QtCore.QSize(512,512)) ## Original Icon File
+		self.setWindowIcon(iconSource)
 		
 		self.move((sW-self.winSize[0])/2,(sH-self.winSize[1])/2);
 		
@@ -160,8 +188,14 @@ class ImageProcessor(QtGui.QMainWindow): # Main Window
 
 		self.setCentralWidget(self.mainWidget)
 
-		## GUI COMPLETE ##
-		# Load image
+		#self.setCursor(QtGui.QCursor(QtCore.Qt.OpenHandCursor))
+	
+	## GUI COMPLETE ##
+	# Load image
+	def finishLoad(self):
+		global curDir
+		global delimit
+		global loadImgUrl
 		self.loadAndScanDir(curDir+delimit, loadImgUrl)
 	def menuBarVis(self,tgl): # Menu Bar, apologies for the "oops" comments, WIP
 		if tgl == 1:
@@ -169,9 +203,11 @@ class ImageProcessor(QtGui.QMainWindow): # Main Window
 			try:
 				self.menuBar=self.menuBar()
 				fileMenu=self.menuBar.addMenu('File')
-				#saveAsItem=QtGui.QAction("Save As...",self)
-				#fileMenu.addAction(saveAsItem)
-				#fileMenu.addSeparator()
+				saveScaledAsItem=QtGui.QAction("Save Scaled Image As...",self)
+				#saveScaledAsItem.triggered.connect(partial(self.saveScaledAs, "toggleInfoWindow"))
+				saveScaledAsItem.triggered.connect(self.saveScaledAs)
+				fileMenu.addAction(saveScaledAsItem)
+				fileMenu.addSeparator()
 				#infoItem=QtGui.QAction("Info",self)
 				#infoItem.triggered.connect(partial(self.menuCommand, "toggleInfoWindow"))
 				#fileMenu.addAction(infoItem)
@@ -553,7 +589,41 @@ class ImageProcessor(QtGui.QMainWindow): # Main Window
 		self.updateImageInfoMenu(loadImage)
 		versionText=pxlViewerTitleBase+str(loadImage.imgName)
 		self.setWindowTitle(versionText)
-		
+	def saveScaledAs(self):
+		curImg=self.curEntryObj.imgPath
+		saveAsPath=curImg
+		saveAsPathArr=saveAsPath.split(".")
+		saveAsExt=saveAsPathArr[-1]
+		saveAsPath=".".join(saveAsPathArr[:-1]) + "_scaled"
+		run=0
+		hit=os.path.exists(saveAsPath+"."+saveAsExt)
+		while hit == True:
+			run+=1
+			if run > 99:
+				saveAsPath=tempFileName
+			else:
+				tempFileName=saveAsPath+"_"+str(run).zfill(2)+"."+saveAsExt
+				hit=os.path.exists(tempFileName)
+				if hit == False:
+					saveAsPath=tempFileName
+					break;
+		saveName=QtGui.QFileDialog.getSaveFileName(self, "Save As ...", saveAsPath, "Image files (*.jpg *.jpeg *.png *.bmp);;All Files (*)")
+
+		if str(saveName) != "" :
+			saveName=str(saveName.replace("/", delimit))  # PIL breaks on QString, convert to python Str
+			saveNameArr=saveName.split(delimit)
+			saveFileName=saveNameArr[-1]
+			toDir=delimit.join(saveNameArr[:-1])
+			
+			imgObj=Image.open(curImg)
+			curScale=self.editViewWindow.scalePerc
+			curSize=imgObj.size # self.curEntryObj.imgSize
+			curSize=( int(curSize[0]*curScale), int(curSize[1]*curScale) )
+			
+			#imgObj=imgObj.resize(curSize, Image.ANTIALIAS)
+			imgObj=imgObj.resize(curSize, Image.BILINEAR)
+			
+			imgObj.save( saveName, imgObj.format )
 	def menuCommand(self, cmd):
 		self.editViewWindow.runCommand(cmd)
 	def updateGalleryVariables(self):
@@ -673,6 +743,7 @@ class EntryViewer(QtWebKit.QWebView):
 		self.entry=entryObj
 		self.win=win
 		self.offset=[]
+		self.scalePerc=1
 		self.mouseDown=0
 		self.mouseDrag=0
 		self.verbose=0
@@ -750,12 +821,14 @@ class EntryViewer(QtWebKit.QWebView):
 	def mouseMoveEvent(self, e):
 		#if type(self.offset)!=QtCore.QPoint:
 		self.offset=e.pos();
+		mousePosUpdate=0
+		self.updateVariable("mouseX",self.offset.x())
+		self.updateVariable("mouseY",self.offset.y())	
 		if self.mouseDown>0:
 			self.updateVariable("dragging",1)
-			self.updateVariable("mouseX",self.offset.x())
-			self.updateVariable("mouseY",self.offset.y())
 			self.updateVariable("mButton",self.mouseDown)
 			if self.mouseDrag==0:
+				super(EntryViewer,self).page().mainFrame().evaluateJavaScript("coordCheckInteract(1);");
 				super(EntryViewer,self).page().mainFrame().evaluateJavaScript("startDrag();");
 			super(EntryViewer,self).page().mainFrame().evaluateJavaScript("doDrag(0);");
 			self.mouseDrag+=1
@@ -768,11 +841,18 @@ class EntryViewer(QtWebKit.QWebView):
 			elif mouseY>20 and self.overMenuBar>0:
 				self.overMenuBar=0
 				self.runCommand("menuBarStatus(-1)")
+			super(EntryViewer,self).page().mainFrame().evaluateJavaScript("coordCheckInteract(0);");
 	@QtCore.pyqtSlot(str)
 	def varValue(self, varArray):
 		print varArray
 	@QtCore.pyqtSlot(str)
 	def showMessage(self, message):
+		splitTgl=0
+		if ":" in message:
+			splitTgl=1
+			splitter=message.split(":")
+			message=splitter[0]
+			value=splitter[1]
 		if message == "loaded":
 			if self.verbose==0:
 				self.runCommand("noContextMenu()")
@@ -784,6 +864,10 @@ class EntryViewer(QtWebKit.QWebView):
 			self.win.prevImage()
 		elif message == "Right":
 			self.win.nextImage()
+		elif message == "scalePerc":
+			self.scalePerc=float(value)
+		elif message == "mouseCoord": ## NOT ACTIVE
+			self.win.nextImage()## 
 		else:
 			print message
 if __name__ == '__main__':
@@ -793,6 +877,7 @@ if __name__ == '__main__':
 	sH=screen.height()
 	galGen=ImageProcessor()
 	galGen.show()
+	galGen.finishLoad()
 	try:
 		sys.exit(app.exec_())
 	except:

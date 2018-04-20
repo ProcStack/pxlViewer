@@ -8,6 +8,7 @@ addedData = {
 			('html\\index.htm','html\\.'),
 			('html\\style.css','html\\.'),
 			('html\\js\\*.js','html\\js'),
+			('html\\data\\*','data'),
 			}
 
 a = Analysis(['pxlViewer.py'],

@@ -7,7 +7,8 @@ addedData = {
 			('README.txt','.'),
 			('html\\index.htm','html\\.'),
 			('html\\style.css','html\\.'),
-			('html\\js\\*.js','html\\js'),
+			('html\\js\\*.js','html\\js\\.'),
+			('data\\*','data\\.'),
 			}
 
 a = Analysis(['pxlViewer.py'],
@@ -30,7 +31,8 @@ exe = EXE(pyz,
           debug=False,
           strip=False,
           upx=True,
-          console=False )
+          console=False,
+		  icon='data\\pxlViewerIcon.ico')
 coll = COLLECT(exe,
                a.binaries,
                a.zipfiles,
