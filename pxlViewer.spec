@@ -3,12 +3,12 @@
 block_cipher = None
 
 addedData = {
-			('README.md','.'),
-			('README.txt','.'),
-			('html\\index.htm','html\\.'),
-			('html\\style.css','html\\.'),
-			('html\\js\\*.js','html\\js'),
-			}
+            ('README.md','.'),
+            ('README.txt','.'),
+            ('html\\index.htm','html\\.'),
+            ('html\\style.css','html\\.'),
+            ('html\\js\\*.js','html\\js'),
+            }
 
 a = Analysis(['pxlViewer.py'],
              pathex=['E:\\projects\\pxlViewer'],
