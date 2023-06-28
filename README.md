@@ -6,7 +6,8 @@ pxlViewer is a slim, in appearance, image viewer.<br/>
 Supporting JPG, JPEG, PNG, BMP, GIF; more to come.<br/>
 
 I was getting a little tired of the default options in linux; so I made this thing.<br/>
-http://metal-asylum.net/github/pxlViewer06Updates.gif
+![Foopy Scooples](http://metal-asylum.net/github/pxlViewer06Updates.gif)
+[pxlVisualizer gif](http://metal-asylum.net/github/pxlViewer06Updates.gif)
 
 **For Windows users-**<br/>
 If you download the repo, copy `dist/pxlViewer` to an appropriate location.<br/>
